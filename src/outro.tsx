@@ -1,5 +1,3 @@
-import React from "react";
-
 const Outro = () => {
   return (
     <section className="outro">
