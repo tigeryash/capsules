@@ -97,7 +97,7 @@ const Cards = () => {
   }, [cards, cardsRef, marquee, titleRefs, test]);
 
   useGSAP(() => {
-    console.log(cards);
+    if (cards.length === 0) return;
     cards.forEach((card, index) => {
       const isLastCard = index === cards.length - 1;
       ScrollTrigger.create({
@@ -151,12 +151,14 @@ const Cards = () => {
 
     cards.forEach((card, index) => {
       if (index === 0) return;
-      const cardDescription = card.querySelector(".card-description");
-      const cardTitleChars = card.querySelector(".char span");
+      const cardDescription =
+        cardsRef.current[index]?.querySelector(".card-description");
+      const cardTitleChars =
+        cardsRef.current[index]?.querySelectorAll(".char span");
+
       ScrollTrigger.create({
         trigger: card,
-        start: "top top",
-
+        start: "top 80%",
         onEnter: () => {
           animateContentIn(cardTitleChars, cardDescription);
         },
