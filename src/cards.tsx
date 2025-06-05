@@ -156,8 +156,7 @@ const Cards = () => {
       ScrollTrigger.create({
         trigger: card,
         start: "top top",
-        end: "bottom top",
-        once: true,
+
         onEnter: () => {
           animateContentIn(cardTitleChars, cardDescription);
         },
