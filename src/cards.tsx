@@ -3,22 +3,22 @@ import { gsap } from "gsap";
 import { forwardRef, useLayoutEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { setUpMarqueeAnimation } from "./marquee";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const Cards = () => {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const marquee = useRef<HTMLDivElement | null>(null);
-  const [titles, setTitles] = useState<HTMLHeadingElement[]>([]);
-  const [cards, setCards] = useState<Element[]>([]);
+  const [cards, setCards] = useState<HTMLElement[]>([]);
   const titleRefs = useRef<HTMLHeadingElement[]>([]);
+  const test = useRef(false);
 
   // Use useLayoutEffect to run after DOM is painted
   useLayoutEffect(() => {
     const titleElements =
       gsap.utils.toArray<HTMLHeadingElement>(".card-title h1");
-    const cardElements = gsap.utils.toArray<Element>(".card");
-    setTitles(titleElements);
+    const cardElements = gsap.utils.toArray<HTMLElement>(".card");
     setCards(cardElements);
 
     // Store refs for GSAP animations
@@ -53,7 +53,7 @@ const Cards = () => {
       onUpdate: (self) => {
         const progress = self.progress;
         const imgScale = 0.5 + progress * 0.5;
-        const borderRadius = 400 + progress * 375;
+        const borderRadius = 400 - progress * 375;
         const innerImgScale = 1.5 - progress * 0.5;
         gsap.set(".card-img", {
           scale: imgScale,
@@ -78,31 +78,105 @@ const Cards = () => {
           });
         }
 
-        if (progress >= 1 && !cards[0].contentRevealed) {
-          cards[0].contentRevealed = true;
+        if (progress >= 1 && !test.current) {
+          test.current = true;
           animateContentIn(
-            cards[0].querySelectorAll(".char span"),
-            cards[0].querySelector(".card-description")
+            cardsRef.current[0]?.querySelectorAll(".char span"),
+            cardsRef.current[0]?.querySelector(".card-description")
           );
         }
-        if (progress < 1 && cards[0].contentRevealed) {
-          cards[0].contentRevealed = false;
+        if (progress < 1 && test.current) {
+          test.current = false;
           animateContentOut(
-            cards[0].querySelectorAll(".char span"),
-            cards[0].querySelector(".card-description")
+            cardsRef.current[0]?.querySelectorAll(".char span"),
+            cardsRef.current[0]?.querySelector(".card-description")
           );
         }
       },
     });
-  });
+  }, [cards, cardsRef, marquee, titleRefs, test]);
+
+  useGSAP(() => {
+    console.log(cards);
+    cards.forEach((card, index) => {
+      const isLastCard = index === cards.length - 1;
+      ScrollTrigger.create({
+        trigger: card,
+        start: "top top",
+        end: isLastCard ? "+=100vh" : "top top",
+        endTrigger: isLastCard ? null : cards[cards.length - 1],
+        pin: true,
+        pinSpacing: isLastCard,
+      });
+    });
+
+    cards.forEach((card, index) => {
+      const cardWrapper = card.querySelector(".card-wrapper");
+      if (index < cards.length - 1) {
+        ScrollTrigger.create({
+          trigger: cards[index + 1],
+          start: "top bottom",
+          end: "top top",
+          onUpdate: (self) => {
+            const progress = self.progress;
+            gsap.set(cardWrapper, {
+              scale: 1 - progress * 0.25,
+              opacity: 1 - progress,
+            });
+          },
+        });
+      }
+    });
+
+    cards.forEach((card, index) => {
+      if (index > 0) {
+        const cardImg = card.querySelector(".card-img img");
+        const imgContainer = card.querySelector(".card-img");
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top bottom",
+          end: "top top",
+          onUpdate: (self) => {
+            const progress = self.progress;
+            gsap.set(cardImg, {
+              scale: 2 - progress,
+            });
+            gsap.set(imgContainer, {
+              borderRadius: 150 - progress * 125 + "px",
+            });
+          },
+        });
+      }
+    });
+
+    cards.forEach((card, index) => {
+      if (index === 0) return;
+      const cardDescription = card.querySelector(".card-description");
+      const cardTitleChars = card.querySelector(".char span");
+      ScrollTrigger.create({
+        trigger: card,
+        start: "top top",
+        end: "bottom top",
+        once: true,
+        onEnter: () => {
+          animateContentIn(cardTitleChars, cardDescription);
+        },
+        onLeaveBack: () => {
+          animateContentOut(cardTitleChars, cardDescription);
+        },
+      });
+    });
+
+    setUpMarqueeAnimation();
+  }, [cards, marquee, titleRefs, test, cardsRef]);
 
   const animateContentIn = (titleChars: any, description: any) => {
     gsap.to(titleChars, {
-      x: 0,
+      x: "0%",
       duration: 0.75,
       ease: "power4.out",
     });
-    gsap.from(description, {
+    gsap.to(description, {
       x: 0,
       opacity: 1,
       duration: 0.75,
@@ -117,7 +191,7 @@ const Cards = () => {
       duration: 0.5,
       ease: "power4.out",
     });
-    gsap.from(description, {
+    gsap.to(description, {
       x: "40px",
       opacity: 0,
       duration: 0.5,
