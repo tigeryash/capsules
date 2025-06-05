@@ -1,0 +1,111 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+@import "tailwindcss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+img {
+  @apply w-full h-full object-cover will-change-transform relative;
+}
+
+h1 {
+  @apply text-[5rem] font-[500] leading-[1.25] tracking-[-.1rem];
+}
+
+p {
+  @apply text-[1.125rem] font-normal leading-[1.25];
+}
+
+section {
+  @apply relative w-[100vw] bg-[#0f0f0f] text-white;
+}
+
+.intro,
+.outro {
+  @apply flex items-center justify-center h-[100svh] p-[1.5em];
+}
+
+.intro h1,
+.outro h1 {
+  @apply w-[60%] text-center leading-[1.1];
+}
+
+.cards {
+  @apply relative flex flex-col gap-[25svh];
+}
+
+.card-marquee {
+  @apply w-full absolute top-[50%] left-0 translate-y-[-50%] overflow-hidden;
+}
+
+.marquee {
+  display: flex;
+}
+
+.marquee h1 {
+  @apply whitespace-nowrap text-[10vw] font-semibold mr-[30px];
+}
+
+.card {
+  @apply relative w-[100vw] h-[100svh] p-[1.5em];
+}
+
+.card-wrapper {
+  @apply relative w-full h-full will-change-transform;
+}
+
+.card-img {
+  @apply absolute w-full h-full rounded-[150px] overflow-hidden;
+}
+
+.card-img img {
+  transform: scale(2);
+}
+
+.card-content {
+  @apply absolute w-full h-full flex items-end justify-center z-1;
+}
+
+.card-content .card-title {
+  @apply w-full absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-center;
+}
+
+.card-content .card-description {
+  @apply text-center w-[40%] mb-[3em] relative translate-x-[40px] opacity-0;
+}
+
+.card:nth-child(2) {
+  margin-top: 50vh;
+}
+
+.char {
+  @apply relative overflow-hidden inline-block;
+}
+
+.char span {
+  @apply translate-x-[100%] inline-block will-change-transform;
+}
+
+@media (max-width: 900px) {
+  h1 {
+    font-size: 2rem;
+    letter-spacing: 0;
+  }
+
+  .intro h1,
+  .outro h1 {
+    width: 100%;
+  }
+
+  .card-content .card-description {
+    width: 90%;
+  }
+}
